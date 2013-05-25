@@ -18,15 +18,20 @@ def main():
 
 class SlotMachine:
   def __init__(self, starting_jackpot, starting_cash):
+    self.POSSIBLE_BETS = "10, 20, 50, 100"
+    self.JACKPOT_INCREASE_RATE = .15
+
     self.starting_jackpot = starting_jackpot
     self.starting_cash = starting_cash
 
-    self.current_jackpot = starting_jackpot
-    self.current_cash = starting_cash
+    self.set_initial_values()
 
+  def set_initial_values(self):
+    self.current_jackpot = self.starting_jackpot
+    self.current_cash = self.starting_cash
     self.results = 3*[""]
     self.turns = 0
-    self.bet = 0
+    self.bet = 10
     self.wins = 0
     self.loses = 0
 
@@ -55,18 +60,20 @@ class SlotMachine:
 
   def set_bet(self):
     bet = -1
-    possible_bets = "10, 20, 50, 100"
     while True:
       print("How much would you bet?")
-      print possible_bets
+      print self.POSSIBLE_BETS
       bet = raw_input(">>> ")
-      if (bet not in possible_bets.split(", ")):
+      if (bet in self.POSSIBLE_BETS.split(", ")):
         break
       else:
         print("Invalid bet value!")
     self.bet = int(bet)
 
   def spin(self):
+    self.__pay()
+    self.__increase_jackpot()
+
     for spin in range(3):
       spinned_result = random.randint(0, 100)
 
@@ -87,8 +94,19 @@ class SlotMachine:
       elif spinned_result in range(99, 100):
           self.results[spin] = "Seven"
 
-  def check_results(self):
-    print ""
+    self.__check_results()
+
+  def __pay(self):
+    self.current_cash -= self.bet
+
+  def __increase_jackpot(self):
+    self.current_jackpot += (int(self.bet * self.JACKPOT_INCREASE_RATE))
+
+  def __check_results(self):
+    print self.results
+
+  def reset(self):
+    self.set_initial_values()
 
 class Player:
   def __init__(self, name):
