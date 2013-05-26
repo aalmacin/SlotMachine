@@ -1,11 +1,12 @@
-# Source File Name: slotmachine.py
+# Source File Name: slotmachine0_1.py
 # Author's Name: Aldrin Jerome Almacin
 # Last Modified By: Aldrin Jerome Almacin
-# Date Last Modified: Saturday May 25, 2013
+# Date Last Modified: Sunday May 26, 2013
 """
   Program Description:  This program simulates a Casino-Style Slot Machine. It provides an GUI
                         for the user that is an image of a slot machine with Label and Button objects
                         created through the tkinter module
+  Version: 0.1: Slot machine console game
 """
 
 # import statements
