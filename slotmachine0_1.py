@@ -109,9 +109,7 @@ class SlotMachine:
     self.__check_results()
 
   def __pay(self):
-    print("Cash Before: ", self.current_cash)
     self.current_cash -= self.bet
-    print("Cash after Payed: ", self.current_cash)
 
   def __increase_jackpot(self):
     self.current_jackpot += (int(self.bet * self.JACKPOT_INCREASE_RATE))
