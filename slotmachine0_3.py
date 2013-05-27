@@ -19,12 +19,17 @@ GAME_TITLE = "Slot Machine"
 BACKGROUND_IMAGE_NAME = "background.png"
 
 class SlotMachineButton(pygame.sprite.Sprite):
-  def __init__(self, image_name, value):
+  def __init__(self, image_name, value, pos):
     pygame.sprite.Sprite.__init__(self)
     self.image = pygame.image.load(image_name)
     self.image = self.image.convert()
     self.rect = self.image.get_rect()
     self.value = value
+    self.rect = self.rect.move(pos)
+    self.pos = pos
+
+  def get_value(self):
+    return self.value
 
 def start_game():
   # Assign the Display Variables
@@ -32,12 +37,17 @@ def start_game():
   screen = pygame.display.set_mode(background.get_size())
   pygame.display.set_caption(GAME_TITLE)
 
-  ten_button = SlotMachineButton("ten_button.png", 10)
-  twenty_button = SlotMachineButton("twenty_button.png", 20)
-  fifty_button = SlotMachineButton("fifty_button.png", 50)
-  hundred_button = SlotMachineButton("hundred_button.png", 100)
+  BUTTON_BOTTOM_POS = background.get_height() - 150
 
-  button_sprites = pygame.sprite.Group(ten_button, twenty_button, fifty_button, hundred_button)
+  distance_between_buttons = 30
+  x = 30
+  buttons = [{"image_name": "ten_button.png", "value": 10}, {"image_name": "twenty_button.png", "value": 20}, {"image_name": "fifty_button.png", "value": 50}, {"image_name": "hundred_button.png", "value": 100}]
+  button_sprites = pygame.sprite.Group()
+
+  for button in buttons:
+    slot_machine_btn = SlotMachineButton(button["image_name"], button["value"], (x, BUTTON_BOTTOM_POS))
+    button_sprites.add(slot_machine_btn)
+    x += slot_machine_btn.image.get_width() + distance_between_buttons
 
   clock = pygame.time.Clock()
 
@@ -49,15 +59,17 @@ def start_game():
     for event in pygame.event.get():
       if (event.type == pygame.QUIT):
         continue_playing = False
+      elif (event.type == pygame.MOUSEBUTTONDOWN):
+        for btn_sprite in button_sprites:
+          if(btn_sprite.rect.collidepoint(event.pos)):
+            print btn_sprite.get_value()
 
-    BUTTON_BOTTOM_POS = background.get_height() - ten_button.image.get_height() - 50
 
     screen.blit(background, background.get_rect())
 
-    x = 30
+    button_sprites.update()
     for btn_sprite in button_sprites:
-      screen.blit(btn_sprite.image, (x, BUTTON_BOTTOM_POS))
-      x += (btn_sprite.image.get_width() + 30)
+      screen.blit(btn_sprite.image, btn_sprite.pos)
 
     pygame.display.flip()
 
