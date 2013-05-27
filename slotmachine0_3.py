@@ -41,12 +41,12 @@ def start_game():
 
   distance_between_buttons = 30
   x = 30
-  buttons = [{"image_name": "ten_button.png", "value": 10}, {"image_name": "twenty_button.png", "value": 20}, {"image_name": "fifty_button.png", "value": 50}, {"image_name": "hundred_button.png", "value": 100}]
-  button_sprites = pygame.sprite.Group()
+  bet_buttons_hash = [{"image_name": "ten_button.png", "value": 10}, {"image_name": "twenty_button.png", "value": 20}, {"image_name": "fifty_button.png", "value": 50}, {"image_name": "hundred_button.png", "value": 100}]
+  bet_buttons = pygame.sprite.Group()
 
-  for button in buttons:
-    slot_machine_btn = SlotMachineButton(button["image_name"], button["value"], (x, BUTTON_BOTTOM_POS))
-    button_sprites.add(slot_machine_btn)
+  for bet_button in bet_buttons_hash:
+    slot_machine_btn = SlotMachineButton(bet_button["image_name"], bet_button["value"], (x, BUTTON_BOTTOM_POS))
+    bet_buttons.add(slot_machine_btn)
     x += slot_machine_btn.image.get_width() + distance_between_buttons
 
   clock = pygame.time.Clock()
@@ -60,16 +60,16 @@ def start_game():
       if (event.type == pygame.QUIT):
         continue_playing = False
       elif (event.type == pygame.MOUSEBUTTONDOWN):
-        for btn_sprite in button_sprites:
-          if(btn_sprite.rect.collidepoint(event.pos)):
-            print btn_sprite.get_value()
+        for bet_button in bet_buttons:
+          if(bet_button.rect.collidepoint(event.pos)):
+            print bet_button.get_value()
 
 
     screen.blit(background, background.get_rect())
 
-    button_sprites.update()
-    for btn_sprite in button_sprites:
-      screen.blit(btn_sprite.image, btn_sprite.pos)
+    bet_buttons.update()
+    for bet_button in bet_buttons:
+      screen.blit(bet_button.image, bet_button.pos)
 
     pygame.display.flip()
 
