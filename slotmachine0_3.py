@@ -60,6 +60,7 @@ class SlotMachineActionButton(pygame.sprite.Sprite):
 class SlotMachine:
   MAIN_MSG = "Aldrin's Slot Machine"
   YOU_WIN = "You just won $"
+  YOU_WIN_JACKPOT = "You win the jackpot price worth $"
   YOU_LOST = "You just lost $"
 
   def __init__(self, starting_jackpot, starting_cash):
@@ -149,19 +150,27 @@ class SlotMachine:
         winnings += self.bet * icon.win_rate_full
       if self.results.count(icon.name) == 2:
         winnings += self.bet * icon.win_rate_two
-    if self.results.count(self.icons[0].name) == 0 and winnings <= 0:
-      winnings += self.bet * self.icons[0].bonus_win_rate
-    if self.results.count(self.icons[7].name) == 1 and winnings <= 0:
+    if self.results.count(self.icons[7].name) == 1:
       winnings += self.bet * self.icons[7].bonus_win_rate
+    if self.results.count(self.icons[0].name) == 0:
+      winnings += self.bet * self.icons[0].bonus_win_rate
 
     if winnings > 0:
       self.current_cash += winnings
       self.current_message = SlotMachine.YOU_WIN + str(winnings)
+      self.play_jackpot()
     else:
       self.current_message = SlotMachine.YOU_LOST + str(self.bet)
 
 
-    #TODO Jackpot
+  def play_jackpot(self):
+    jackpot_try = random.randrange(1, 51, 1)
+    jackpot_win = random.randrange(1, 51, 1)
+
+    if jackpot_try == jackpot_win:
+      self.current_cash += self.current_jackpot
+      self.current_message = SlotMachine.YOU_WIN_JACKPOT + str(self.current_jackpot)
+      self.current_jackpot = self.starting_jackpot
 
   def get_results(self):
     return self.results
