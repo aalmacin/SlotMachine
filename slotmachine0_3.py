@@ -60,7 +60,7 @@ class SlotMachineActionButton(pygame.sprite.Sprite):
 class SlotMachine:
   MAIN_MSG = "Aldrin's Slot Machine"
   YOU_WIN = "You just won $"
-  YOU_WIN_JACKPOT = "You win the jackpot price worth $"
+  YOU_WIN_JACKPOT = "You won the jackpot price worth $"
   YOU_LOST = "You just lost $"
 
   def __init__(self, starting_jackpot, starting_cash):
