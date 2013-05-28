@@ -58,8 +58,13 @@ class SlotMachineActionButton(pygame.sprite.Sprite):
   Class: SlotMachine
 """
 class SlotMachine:
+  MAIN_MSG = "Aldrin's Slot Machine"
+  YOU_WIN = "You just won $"
+  YOU_LOST = "You just lost $"
+
   def __init__(self, starting_jackpot, starting_cash):
     self.JACKPOT_INCREASE_RATE = .15
+    self.current_message = SlotMachine.MAIN_MSG
 
     self.starting_jackpot = starting_jackpot
     self.starting_cash = starting_cash
@@ -128,6 +133,9 @@ class SlotMachine:
     self.__check_results()
     time.sleep(3)
 
+  def get_current_message(self):
+    return self.current_message
+
   def __pay(self):
     self.current_cash -= self.bet
 
@@ -135,18 +143,23 @@ class SlotMachine:
     self.current_jackpot += (int(self.bet * self.JACKPOT_INCREASE_RATE))
 
   def __check_results(self):
-    win = False
+    winnings = 0
     for icon in self.icons:
       if self.results.count(icon.name) == 3:
-        self.current_cash += self.bet * icon.win_rate_full
-        win = True
+        winnings += self.bet * icon.win_rate_full
       if self.results.count(icon.name) == 2:
-        self.current_cash += self.bet * icon.win_rate_two
-        win = True
-    if self.results.count(self.icons[0].name) == 0 and not win:
-      self.current_cash += self.bet * self.icons[0].bonus_win_rate
-    if self.results.count(self.icons[7].name) == 1 and not win:
-      self.current_cash += self.bet * self.icons[7].bonus_win_rate
+        winnings += self.bet * icon.win_rate_two
+    if self.results.count(self.icons[0].name) == 0 and winnings <= 0:
+      winnings += self.bet * self.icons[0].bonus_win_rate
+    if self.results.count(self.icons[7].name) == 1 and winnings <= 0:
+      winnings += self.bet * self.icons[7].bonus_win_rate
+
+    if winnings > 0:
+      self.current_cash += winnings
+      self.current_message = SlotMachine.YOU_WIN + str(winnings)
+    else:
+      self.current_message = SlotMachine.YOU_LOST + str(self.bet)
+
 
     #TODO Jackpot
 
@@ -218,7 +231,8 @@ def start_game():
   digital_fonts_hash = [
     {"text": "Bet: ", "method": slot_machine.get_bet, "pos": (50, 400)},
     {"text": "Credit: ", "method": slot_machine.get_current_cash, "pos": (160, 400)},
-    {"text": "Jackpot: ", "method": slot_machine.get_current_jackpot, "pos": (330, 400)}
+    {"text": "Jackpot: ", "method": slot_machine.get_current_jackpot, "pos": (330, 400)},
+    {"text": "", "method": slot_machine.get_current_message, "pos": (200, 10)}
   ]
   digital_fonts = pygame.sprite.Group()
 
