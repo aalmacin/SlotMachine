@@ -62,6 +62,9 @@ class SlotMachine:
   YOU_WIN = "You just won $"
   YOU_WIN_JACKPOT = "You won the jackpot price worth $"
   YOU_LOST = "You just lost $"
+  YOU_BET = "You bet $"
+  NO_CASH_LEFT = "Cannot bet to that amount. Cash not enough."
+  CANNOT_SPIN = "Cannot spin. Change bet to a lower value."
 
   def __init__(self, starting_jackpot, starting_cash):
     self.JACKPOT_INCREASE_RATE = .15
@@ -77,8 +80,9 @@ class SlotMachine:
     self.current_jackpot = self.starting_jackpot
     self.current_cash = self.starting_cash
     self.results = 3*["Siete"]
-    self.turns = 0
     self.bet = 10
+    # TODO turns , wins , loses
+    self.turns = 0
     self.wins = 0
     self.loses = 0
 
@@ -93,7 +97,11 @@ class SlotMachine:
     self.icons.append(Icon("Siete", 1000, 20, "siete.png", bonus_win_rate = 10))
 
   def set_bet(self, bet):
-    self.bet = bet
+    if self.current_cash - bet >= 0:
+      self.bet = bet
+      self.current_message = SlotMachine.YOU_BET + str(self.bet)
+    else:
+      self.current_message = SlotMachine.NO_CASH_LEFT
 
   def get_bet(self):
     return self.bet
@@ -108,31 +116,34 @@ class SlotMachine:
     return self.icons
 
   def spin(self):
-    self.__pay()
-    self.__increase_jackpot()
+    if self.current_cash - self.bet >= 0:
+      self.__pay()
+      self.__increase_jackpot()
 
-    for spin in range(3):
-      spinned_result = random.randint(0, 100)
+      for spin in range(3):
+        spinned_result = random.randint(0, 100)
 
-      if spinned_result in range(0, 40):
-          self.results[spin] = self.icons[0].name
-      elif spinned_result in range(40, 56):
-          self.results[spin] = self.icons[1].name
-      elif spinned_result in range(56, 70):
-          self.results[spin] = self.icons[2].name
-      elif spinned_result in range(70, 82):
-          self.results[spin] = self.icons[3].name
-      elif spinned_result in range(82, 89):
-          self.results[spin] = self.icons[4].name
-      elif spinned_result in range(89, 95):
-          self.results[spin] = self.icons[5].name
-      elif spinned_result in range(95, 99):
-          self.results[spin] = self.icons[6].name
-      elif spinned_result in range(99, 100):
-          self.results[spin] = self.icons[7].name
+        if spinned_result in range(0, 40):
+            self.results[spin] = self.icons[0].name
+        elif spinned_result in range(40, 56):
+            self.results[spin] = self.icons[1].name
+        elif spinned_result in range(56, 70):
+            self.results[spin] = self.icons[2].name
+        elif spinned_result in range(70, 82):
+            self.results[spin] = self.icons[3].name
+        elif spinned_result in range(82, 89):
+            self.results[spin] = self.icons[4].name
+        elif spinned_result in range(89, 95):
+            self.results[spin] = self.icons[5].name
+        elif spinned_result in range(95, 99):
+            self.results[spin] = self.icons[6].name
+        elif spinned_result in range(99, 100):
+            self.results[spin] = self.icons[7].name
 
-    self.__check_results()
-    time.sleep(3)
+      self.__check_results()
+      time.sleep(3)
+    else:
+      self.current_message = SlotMachine.CANNOT_SPIN
 
   def get_current_message(self):
     return self.current_message
@@ -241,7 +252,7 @@ def start_game():
     {"text": "Bet: ", "method": slot_machine.get_bet, "pos": (50, 400)},
     {"text": "Credit: ", "method": slot_machine.get_current_cash, "pos": (160, 400)},
     {"text": "Jackpot: ", "method": slot_machine.get_current_jackpot, "pos": (330, 400)},
-    {"text": "", "method": slot_machine.get_current_message, "pos": (200, 10)}
+    {"text": "", "method": slot_machine.get_current_message, "pos": (150, 10)}
   ]
   digital_fonts = pygame.sprite.Group()
 
