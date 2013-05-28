@@ -118,6 +118,23 @@ class SlotMachine:
   def reset(self):
     self.set_initial_values()
 
+class DigitalFont(pygame.sprite.Sprite):
+  def __init__(self, text, method, pos):
+    pygame.sprite.Sprite.__init__(self)
+    self.digital_font = pygame.font.Font("fonts/DS-DIGIT.TTF", 32)
+    self.text = text
+    self.meth = method
+    self.pos = pos
+
+  def get_rendered_surface(self):
+    return self.digital_font.render(self.text + str(self.meth()), 1, (0,0,0))
+
+  def get_pos(self):
+    return self.pos
+
+  def update(self):
+    self.digital_font.render(self.text + str(self.meth()), 1, (0,0,0))
+
 def start_game():
   # Assign the Display Variables
   background = pygame.image.load(BACKGROUND_IMAGE_NAME)
@@ -125,17 +142,28 @@ def start_game():
   pygame.display.set_caption(GAME_TITLE)
 
   slot_machine = SlotMachine(500, 1000)
-  digital_font = pygame.font.Font("fonts/DS-DIGIT.TTF", 32)
 
-  bet_count = digital_font.render("Bet: " + str(slot_machine.get_bet()), 1, (0, 0, 0))
-  current_cash_count = digital_font.render("Credit: " + str(slot_machine.get_current_cash()), 1, (0, 0, 0))
-  current_jackpot_count = digital_font.render("Jackpot: " + str(slot_machine.get_current_jackpot()), 1, (0, 0, 0))
+  digital_fonts_hash = [
+    {"text": "Bet: ", "method": slot_machine.get_bet, "pos": (50, 400)},
+    {"text": "Credit: ", "method": slot_machine.get_current_cash, "pos": (160, 400)},
+    {"text": "Jackpot: ", "method": slot_machine.get_current_jackpot, "pos": (330, 400)}
+  ]
+  digital_fonts = pygame.sprite.Group()
+
+  for digital_font in digital_fonts_hash:
+    digital_fonts.add(DigitalFont(digital_font["text"], digital_font["method"], digital_font["pos"]))
+
 
   BUTTON_BOTTOM_POS = background.get_height() - 150
 
   distance_between_buttons = 30
   x = 30
-  bet_buttons_hash = [{"image_name": "ten_button.png", "value": 10}, {"image_name": "twenty_button.png", "value": 20}, {"image_name": "fifty_button.png", "value": 50}, {"image_name": "hundred_button.png", "value": 100}]
+  bet_buttons_hash = [
+    {"image_name": "ten_button.png", "value": 10},
+    {"image_name": "twenty_button.png", "value": 20},
+    {"image_name": "fifty_button.png", "value": 50},
+    {"image_name": "hundred_button.png", "value": 100}
+  ]
   bet_buttons = pygame.sprite.Group()
 
   for bet_button in bet_buttons_hash:
@@ -157,12 +185,12 @@ def start_game():
         for bet_button in bet_buttons:
           if(bet_button.rect.collidepoint(event.pos)):
             slot_machine.set_bet(bet_button.get_value())
-            bet_count = digital_font.render("Bet: " + str(slot_machine.get_bet()), 1, (0, 0, 0))
 
     screen.blit(background, background.get_rect())
-    screen.blit(bet_count, (50, 400))
-    screen.blit(current_cash_count, (160, 400))
-    screen.blit(current_jackpot_count, (330, 400))
+
+    digital_fonts.update()
+    for digital_font in digital_fonts:
+      screen.blit(digital_font.get_rendered_surface(), digital_font.get_pos())
 
     # Update to make sure that the rect follows the image
     bet_buttons.update()
