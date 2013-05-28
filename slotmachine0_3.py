@@ -70,7 +70,7 @@ class SlotMachine:
   def set_initial_values(self):
     self.current_jackpot = self.starting_jackpot
     self.current_cash = self.starting_cash
-    self.results = 3*[""]
+    self.results = 3*["Siete"]
     self.turns = 0
     self.bet = 10
     self.wins = 0
@@ -97,6 +97,9 @@ class SlotMachine:
 
   def get_current_jackpot(self):
     return self.current_jackpot
+
+  def get_icons(self):
+    return self.icons
 
   def spin(self):
     self.__pay()
@@ -147,11 +150,8 @@ class SlotMachine:
 
     #TODO Jackpot
 
-    print self.results
-    print "Cash",
-    print self.current_cash
-    print "Bet",
-    print self.bet
+  def get_results(self):
+    return self.results
 
   def reset(self):
     self.set_initial_values()
@@ -159,9 +159,13 @@ class SlotMachine:
 """
   Class: Icon
 """
-class Icon:
+class Icon(pygame.sprite.Sprite):
   def __init__(self, name, win_rate_full, win_rate_two, icon_image, bonus_win_rate = 0):
+    pygame.sprite.Sprite.__init__(self)
     self.name = name
+    self.image = pygame.image.load("images/" + icon_image)
+    self.image = self.image.convert()
+    self.rect = self.image.get_rect()
     self.win_rate_full = win_rate_full
     self.win_rate_two = win_rate_two
     self.bonus_win_rate = bonus_win_rate
@@ -179,7 +183,7 @@ class Icon:
     return self.name
 
   def get_image():
-    return self.icon_image
+    return self.image
 
 """
   Class: DigitalFont
@@ -208,6 +212,8 @@ def start_game():
   pygame.display.set_caption(GAME_TITLE)
 
   slot_machine = SlotMachine(500, 1000)
+  spin_results = slot_machine.get_results()
+  icon_images = []
 
   digital_fonts_hash = [
     {"text": "Bet: ", "method": slot_machine.get_bet, "pos": (50, 400)},
@@ -245,7 +251,19 @@ def start_game():
   for action_button in action_buttons_hash:
     action_buttons.add(SlotMachineActionButton("images/" + action_button["image_name"], action_button["method"], action_button["pos"]))
 
+  all_symbols = pygame.sprite.Group()
+  icons = slot_machine.get_icons()
+  for icon in icons:
+    all_symbols.add(icon)
+
   clock = pygame.time.Clock()
+
+  reel_positions = [(40, 150), (270, 150), (500, 150)]
+
+  for symbol in all_symbols:
+    for symbol_name in spin_results:
+      if (symbol.name == symbol_name):
+        icon_images.append(symbol)
 
   continue_playing = True
   while (continue_playing):
@@ -262,6 +280,13 @@ def start_game():
         for action_button in action_buttons:
           if(action_button.rect.collidepoint(event.pos)):
             action_button.call_method()
+            spin_results = slot_machine.get_results()
+
+            icon_images = []
+            for symbol in all_symbols:
+              for symbol_name in spin_results:
+                if (symbol.name == symbol_name):
+                  icon_images.append(symbol)
 
     screen.blit(background, background.get_rect())
 
@@ -276,6 +301,9 @@ def start_game():
     bet_buttons.update()
     for bet_button in bet_buttons:
       screen.blit(bet_button.image, bet_button.pos)
+
+    for i in range(3):
+      screen.blit(icon_images[i].image, reel_positions[i])
 
     pygame.display.flip()
 
