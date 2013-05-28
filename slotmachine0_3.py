@@ -12,6 +12,7 @@
 # import statements
 import random
 import pygame
+import time
 
 pygame.init()
 FRAME_RATE = 30
@@ -122,6 +123,7 @@ class SlotMachine:
           self.results[spin] = self.icons[7].name
 
     self.__check_results()
+    time.sleep(3)
 
   def __pay(self):
     self.current_cash -= self.bet
