@@ -31,6 +31,22 @@ class SlotMachineButton(pygame.sprite.Sprite):
   def get_value(self):
     return self.value
 
+class SlotMachineActionButton(pygame.sprite.Sprite):
+  def __init__(self, image_name, method_to_be_called, pos):
+    pygame.sprite.Sprite.__init__(self)
+    self.image = pygame.image.load(image_name)
+    self.image = self.image.convert()
+    self.rect = self.image.get_rect()
+    self.rect = self.rect.move(pos)
+    self.method_to_be_called = method_to_be_called
+    self.pos = pos
+
+  def call_method(self):
+    self.method_to_be_called()
+
+  def get_pos(self):
+    return self.pos
+
 class SlotMachine:
   def __init__(self, starting_jackpot, starting_cash):
     self.JACKPOT_INCREASE_RATE = .15
@@ -153,7 +169,6 @@ def start_game():
   for digital_font in digital_fonts_hash:
     digital_fonts.add(DigitalFont(digital_font["text"], digital_font["method"], digital_font["pos"]))
 
-
   BUTTON_BOTTOM_POS = background.get_height() - 150
 
   distance_between_buttons = 30
@@ -171,6 +186,15 @@ def start_game():
     bet_buttons.add(slot_machine_btn)
     x += slot_machine_btn.image.get_width() + distance_between_buttons
 
+  action_buttons_hash = [
+    {"image_name": "spin_button.png", "method": slot_machine.spin, "pos": (100, 100)},
+    {"image_name": "reset_button.png", "method": slot_machine.reset, "pos": (100, 200)},
+  ]
+  action_buttons = pygame.sprite.Group()
+
+  for action_button in action_buttons_hash:
+    action_buttons.add(SlotMachineActionButton("images/" + action_button["image_name"], action_button["method"], action_button["pos"]))
+
   clock = pygame.time.Clock()
 
   continue_playing = True
@@ -185,14 +209,20 @@ def start_game():
         for bet_button in bet_buttons:
           if(bet_button.rect.collidepoint(event.pos)):
             slot_machine.set_bet(bet_button.get_value())
+        for action_button in action_buttons:
+          if(action_button.rect.collidepoint(event.pos)):
+            action_button.call_method()
 
     screen.blit(background, background.get_rect())
+
+    action_buttons.update()
+    for action_button in action_buttons:
+      screen.blit(action_button.image, action_button.get_pos())
 
     digital_fonts.update()
     for digital_font in digital_fonts:
       screen.blit(digital_font.get_rendered_surface(), digital_font.get_pos())
 
-    # Update to make sure that the rect follows the image
     bet_buttons.update()
     for bet_button in bet_buttons:
       screen.blit(bet_button.image, bet_button.pos)
