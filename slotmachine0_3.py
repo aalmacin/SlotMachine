@@ -244,7 +244,7 @@ def start_game():
 
   action_buttons_hash = [
     {"image_name": "spin_button.png", "method": slot_machine.spin, "pos": (550, BUTTON_BOTTOM_POS)},
-    {"image_name": "reset_button.png", "method": slot_machine.reset, "pos": (670, BUTTON_BOTTOM_POS)},
+    {"image_name": "reset_button.png", "method": slot_machine.reset, "pos": (670, BUTTON_BOTTOM_POS)}
   ]
   action_buttons = pygame.sprite.Group()
 
