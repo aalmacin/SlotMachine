@@ -55,6 +55,12 @@ class SlotMachine:
   def get_bet(self):
     return self.bet
 
+  def get_current_cash(self):
+    return self.current_cash
+
+  def get_current_jackpot(self):
+    return self.current_jackpot
+
   def spin(self):
     self.__pay()
     self.__increase_jackpot()
@@ -122,6 +128,8 @@ def start_game():
   digital_font = pygame.font.Font("fonts/DS-DIGIT.TTF", 32)
 
   bet_count = digital_font.render("Bet: " + str(slot_machine.get_bet()), 1, (0, 0, 0))
+  current_cash_count = digital_font.render("Credit: " + str(slot_machine.get_current_cash()), 1, (0, 0, 0))
+  current_jackpot_count = digital_font.render("Jackpot: " + str(slot_machine.get_current_jackpot()), 1, (0, 0, 0))
 
   BUTTON_BOTTOM_POS = background.get_height() - 150
 
@@ -152,7 +160,9 @@ def start_game():
             bet_count = digital_font.render("Bet: " + str(slot_machine.get_bet()), 1, (0, 0, 0))
 
     screen.blit(background, background.get_rect())
-    screen.blit(bet_count, bet_count.get_rect())
+    screen.blit(bet_count, (50, 400))
+    screen.blit(current_cash_count, (160, 400))
+    screen.blit(current_jackpot_count, (330, 400))
 
     # Update to make sure that the rect follows the image
     bet_buttons.update()
