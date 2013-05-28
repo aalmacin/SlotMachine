@@ -119,6 +119,9 @@ def start_game():
   pygame.display.set_caption(GAME_TITLE)
 
   slot_machine = SlotMachine(500, 1000)
+  digital_font = pygame.font.Font("fonts/DS-DIGIT.TTF", 32)
+
+  bet_count = digital_font.render("Bet: " + str(slot_machine.get_bet()), 1, (0, 0, 0))
 
   BUTTON_BOTTOM_POS = background.get_height() - 150
 
@@ -146,8 +149,10 @@ def start_game():
         for bet_button in bet_buttons:
           if(bet_button.rect.collidepoint(event.pos)):
             slot_machine.set_bet(bet_button.get_value())
+            bet_count = digital_font.render("Bet: " + str(slot_machine.get_bet()), 1, (0, 0, 0))
 
     screen.blit(background, background.get_rect())
+    screen.blit(bet_count, bet_count.get_rect())
 
     # Update to make sure that the rect follows the image
     bet_buttons.update()
