@@ -18,6 +18,9 @@ FRAME_RATE = 30
 GAME_TITLE = "Slot Machine"
 BACKGROUND_IMAGE_NAME = "images/background.png"
 
+"""
+  Class: SlotMachineButton
+"""
 class SlotMachineButton(pygame.sprite.Sprite):
   def __init__(self, image_name, value, pos):
     pygame.sprite.Sprite.__init__(self)
@@ -31,6 +34,9 @@ class SlotMachineButton(pygame.sprite.Sprite):
   def get_value(self):
     return self.value
 
+"""
+  Class: SlotMachineActionButton
+"""
 class SlotMachineActionButton(pygame.sprite.Sprite):
   def __init__(self, image_name, method_to_be_called, pos):
     pygame.sprite.Sprite.__init__(self)
@@ -47,13 +53,17 @@ class SlotMachineActionButton(pygame.sprite.Sprite):
   def get_pos(self):
     return self.pos
 
+"""
+  Class: SlotMachine
+"""
 class SlotMachine:
   def __init__(self, starting_jackpot, starting_cash):
     self.JACKPOT_INCREASE_RATE = .15
 
     self.starting_jackpot = starting_jackpot
     self.starting_cash = starting_cash
-
+    self.icons = []
+    self.__create_icons()
     self.set_initial_values()
 
   def set_initial_values(self):
@@ -64,6 +74,16 @@ class SlotMachine:
     self.bet = 10
     self.wins = 0
     self.loses = 0
+
+  def __create_icons(self):
+    self.icons.append(Icon("Sad Face", 0, 0, "sadface.png", bonus_win_rate = 2))
+    self.icons.append(Icon("Katipunero Hat", 20, 2, "katipunero_hat.png"))
+    self.icons.append(Icon("Bandana", 30, 2, "bandana.png"))
+    self.icons.append(Icon("Camesa De Chino", 40, 3, "camesa_de_chino.png"))
+    self.icons.append(Icon("Banyal", 100, 4, "banyal.png"))
+    self.icons.append(Icon("Tsinelas", 200, 5, "tsinelas.png"))
+    self.icons.append(Icon("Arnis", 300, 10, "arnis.png"))
+    self.icons.append(Icon("Siete", 1000, 20, "siete.png", bonus_win_rate = 10))
 
   def set_bet(self, bet):
     self.bet = bet
@@ -134,6 +154,34 @@ class SlotMachine:
   def reset(self):
     self.set_initial_values()
 
+"""
+  Class: Icon
+"""
+class Icon:
+  def __init__(self, name, win_rate_full, win_rate_two, icon_image, bonus_win_rate = 0):
+    self.name = name
+    self.win_rate_full = win_rate_full
+    self.win_rate_two = win_rate_two
+    self.bonus_win_rate = bonus_win_rate
+
+  def get_win_rate_full():
+    return self.win_rate_full
+
+  def get_win_rate_two():
+    return self.win_rate_two
+
+  def get_bonus_win_rate():
+    return self.bonus_win_rate
+
+  def get_name():
+    return self.name
+
+  def get_image():
+    return self.icon_image
+
+"""
+  Class: DigitalFont
+"""
 class DigitalFont(pygame.sprite.Sprite):
   def __init__(self, text, method, pos):
     pygame.sprite.Sprite.__init__(self)
@@ -187,8 +235,8 @@ def start_game():
     x += slot_machine_btn.image.get_width() + distance_between_buttons
 
   action_buttons_hash = [
-    {"image_name": "spin_button.png", "method": slot_machine.spin, "pos": (100, 100)},
-    {"image_name": "reset_button.png", "method": slot_machine.reset, "pos": (100, 200)},
+    {"image_name": "spin_button.png", "method": slot_machine.spin, "pos": (550, BUTTON_BOTTOM_POS)},
+    {"image_name": "reset_button.png", "method": slot_machine.reset, "pos": (670, BUTTON_BOTTOM_POS)},
   ]
   action_buttons = pygame.sprite.Group()
 
