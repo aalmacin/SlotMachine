@@ -240,21 +240,21 @@ class Icon(pygame.sprite.Sprite):
   Class: DigitalFont
 """
 class DigitalFont(pygame.sprite.Sprite):
-  def __init__(self, text, method, pos):
+  def __init__(self, method, pos, color = (196,65,46)):
     pygame.sprite.Sprite.__init__(self)
-    self.digital_font = pygame.font.Font("fonts/DS-DIGIT.TTF", 32)
-    self.text = text
+    self.digital_font = pygame.font.Font("fonts/DS-DIGIT.TTF", 22)
+    self.font_color = color
     self.meth = method
     self.pos = pos
 
   def get_rendered_surface(self):
-    return self.digital_font.render(self.text + str(self.meth()), 1, (0,0,0))
+    return self.digital_font.render(str(self.meth()), 1, self.font_color)
 
   def get_pos(self):
     return self.pos
 
   def update(self):
-    self.digital_font.render(self.text + str(self.meth()), 1, (0,0,0))
+    self.digital_font.render(str(self.meth()), 1, self.font_color)
 
 def start_game():
   # Assign the Display Variables
@@ -267,37 +267,35 @@ def start_game():
   icon_images = []
 
   digital_fonts_hash = [
-    {"text": "Bet: ", "method": slot_machine.get_bet, "pos": (50, 400)},
-    {"text": "Credit: ", "method": slot_machine.get_current_cash, "pos": (160, 400)},
-    {"text": "Jackpot: ", "method": slot_machine.get_current_jackpot, "pos": (330, 400)},
+    {"method": slot_machine.get_bet, "pos": (245, 424)},
+    {"method": slot_machine.get_current_cash, "pos": (80, 424)},
+    {"method": slot_machine.get_current_jackpot, "pos": (445, 424)},
   ]
   digital_fonts = pygame.sprite.Group()
 
-  current_message_digifont = DigitalFont("", slot_machine.get_current_message, (150, 10))
+  current_message_digifont = DigitalFont(slot_machine.get_current_message, (100, 140), (0, 0, 0))
 
   for digital_font in digital_fonts_hash:
-    digital_fonts.add(DigitalFont(digital_font["text"], digital_font["method"], digital_font["pos"]))
+    digital_fonts.add(DigitalFont(digital_font["method"], digital_font["pos"]))
 
-  BUTTON_BOTTOM_POS = background.get_height() - 150
+  BUTTON_BOTTOM_POS = background.get_height() - 165
 
   distance_between_buttons = 30
-  x = 30
+  x = 70
   bet_buttons_hash = [
   #TODO One Button
-    {"image_name": "ten_button.png", "value": 10},
-    {"image_name": "twenty_button.png", "value": 20},
-    {"image_name": "fifty_button.png", "value": 50},
-    {"image_name": "hundred_button.png", "value": 100}
+    {"image_name": "ten_button.png", "value": 10, "pos": (70, BUTTON_BOTTOM_POS)},
+    {"image_name": "twenty_button.png", "value": 20, "pos": (150, BUTTON_BOTTOM_POS)},
+    {"image_name": "fifty_button.png", "value": 50, "pos": (480, BUTTON_BOTTOM_POS)},
+    {"image_name": "hundred_button.png", "value": 100, "pos": (560, BUTTON_BOTTOM_POS)}
   ]
   bet_buttons = pygame.sprite.Group()
 
   for bet_button in bet_buttons_hash:
-    slot_machine_btn = SlotMachineButton("images/" + bet_button["image_name"], bet_button["value"], (x, BUTTON_BOTTOM_POS))
-    bet_buttons.add(slot_machine_btn)
-    x += slot_machine_btn.image.get_width() + distance_between_buttons
+    bet_buttons.add(SlotMachineButton("images/" + bet_button["image_name"], bet_button["value"], bet_button["pos"]))
 
-  spin_button = SlotMachineActionButton("images/spin_button.png" , slot_machine.spin, (550, BUTTON_BOTTOM_POS))
-  reset_button = SlotMachineActionButton("images/reset_button.png" , slot_machine.reset, (670, BUTTON_BOTTOM_POS))
+  spin_button = SlotMachineActionButton("images/spin_button.png" , slot_machine.spin, (270, BUTTON_BOTTOM_POS))
+  reset_button = SlotMachineActionButton("images/reset_button.png" , slot_machine.reset, (210, BUTTON_BOTTOM_POS + 30))
   action_buttons = pygame.sprite.Group(spin_button, reset_button)
 
   all_symbols = pygame.sprite.Group()
@@ -307,7 +305,7 @@ def start_game():
 
   clock = pygame.time.Clock()
 
-  reel_positions = [(40, 150), (270, 150), (500, 150)]
+  reel_positions = [(75, 258), (265, 258), (445, 258)]
 
   for symbol in all_symbols:
     for symbol_name in spin_results:
@@ -331,10 +329,10 @@ def start_game():
   def prev_get_current_msg():
     return prev_current_msg
 
-  prev_bet_digifont = DigitalFont("Bet: ", prev_get_bet, (50, 400))
-  prev_cash_digifont = DigitalFont("Credit: ", prev_get_current_cash, (160, 400))
-  prev_jackpot_digifont = DigitalFont("Jackpot: ", prev_get_current_jackpot, (330, 400))
-  prev_message_digifont = DigitalFont("", prev_get_current_msg, (150, 10))
+  prev_bet_digifont = DigitalFont(prev_get_bet, (245, 424))
+  prev_cash_digifont = DigitalFont(prev_get_current_cash, (80, 424))
+  prev_jackpot_digifont = DigitalFont(prev_get_current_jackpot, (445, 424))
+  prev_message_digifont = DigitalFont(prev_get_current_msg, (100, 140))
 
   prev_digifonts = pygame.sprite.Group(prev_bet_digifont, prev_jackpot_digifont, prev_cash_digifont, prev_message_digifont)
 
