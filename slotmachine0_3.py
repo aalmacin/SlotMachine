@@ -188,6 +188,7 @@ class SlotMachine:
 
   def reset(self):
     self.set_initial_values()
+    self.current_message = SlotMachine.MAIN_MSG
 
 """
   Class: Icon
@@ -278,6 +279,7 @@ def start_game():
 
   action_buttons_hash = [
     {"image_name": "spin_button.png", "method": slot_machine.spin, "pos": (550, BUTTON_BOTTOM_POS)},
+    #TODO Quit button
     {"image_name": "reset_button.png", "method": slot_machine.reset, "pos": (670, BUTTON_BOTTOM_POS)}
   ]
   action_buttons = pygame.sprite.Group()
