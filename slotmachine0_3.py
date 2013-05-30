@@ -70,6 +70,9 @@ class SlotMachine:
     pygame.mixer.init()
     self.bet_snd = pygame.mixer.Sound("sounds/bet_snd.wav")
     self.bet_no_cash_snd = pygame.mixer.Sound("sounds/bet_no_cash_snd.wav")
+    self.spin_snd = pygame.mixer.Sound("sounds/spin_snd.ogg")
+    self.spinning_snd = pygame.mixer.Sound("sounds/spinning_snd.ogg")
+    self.reset_snd = pygame.mixer.Sound("sounds/reset_snd.ogg")
 
     self.JACKPOT_INCREASE_RATE = .15
     self.current_message = SlotMachine.MAIN_MSG
@@ -123,6 +126,7 @@ class SlotMachine:
 
   def spin(self):
     if self.current_cash - self.bet >= 0:
+      self.spin_snd.play()
       self.__pay()
       self.__increase_jackpot()
 
@@ -311,6 +315,7 @@ def start_game():
         icon_images.append(symbol)
   start_time = 0
   spinning = False
+  prev_results = slot_machine.get_results()
 
   continue_playing = True
   while (continue_playing):
@@ -337,6 +342,7 @@ def start_game():
             start_time = time.time()
             spinning = True
         elif(reset_button.rect.collidepoint(event.pos)):
+          slot_machine.reset_snd.play()
           reset_button.call_method()
 
 
@@ -356,12 +362,18 @@ def start_game():
 
     if time.time() - start_time < 1:
       for i in range(3):
+        screen.blit(prev_results[i].image, reel_positions[i])
+    elif time.time() - start_time < 2:
+      for i in range(3):
         screen.blit(icons[random.randint(0, len(icons) - 1)].image, reel_positions[i])
+      slot_machine.spinning_snd.play()
     else:
       for i in range(3):
         screen.blit(icon_images[i].image, reel_positions[i])
       screen.blit(current_message_digifont.get_rendered_surface(), current_message_digifont.get_pos())
       spinning = False
+      prev_results = icon_images
+      slot_machine.spinning_snd.stop()
 
     pygame.display.flip()
 
