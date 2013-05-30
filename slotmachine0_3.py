@@ -91,14 +91,14 @@ class SlotMachine:
     self.loses = 0
 
   def __create_icons(self):
-    self.icons.append(Icon("Sad Face", 0, 0, "sadface.png", bonus_win_rate = 2))
-    self.icons.append(Icon("Katipunero Hat", 20, 2, "katipunero_hat.png"))
-    self.icons.append(Icon("Bandana", 30, 2, "bandana.png"))
-    self.icons.append(Icon("Camesa De Chino", 40, 3, "camesa_de_chino.png"))
-    self.icons.append(Icon("Banyal", 100, 4, "banyal.png"))
-    self.icons.append(Icon("Tsinelas", 200, 5, "tsinelas.png"))
-    self.icons.append(Icon("Arnis", 300, 10, "arnis.png"))
-    self.icons.append(Icon("Siete", 1000, 20, "siete.png", bonus_win_rate = 10))
+    self.icons.append(Icon("Sad Face", 0, 0, "sadface.png", bonus_win_rate = 1)) # The win rate is for when no sad face is on the reel
+    self.icons.append(Icon("Katipunero Hat", 10, 1, "katipunero_hat.png"))
+    self.icons.append(Icon("Bandana", 20, 2, "bandana.png"))
+    self.icons.append(Icon("Camesa De Chino", 30, 2, "camesa_de_chino.png"))
+    self.icons.append(Icon("Banyal", 100, 2, "banyal.png"))
+    self.icons.append(Icon("Tsinelas", 200, 2, "tsinelas.png"))
+    self.icons.append(Icon("Arnis", 300, 5, "arnis.png"))
+    self.icons.append(Icon("Siete", 1000, 10, "siete.png", bonus_win_rate = 5))
 
   def set_bet(self, bet):
     if self.current_cash - bet >= 0:
@@ -181,10 +181,10 @@ class SlotMachine:
 
 
   def play_jackpot(self):
-    jackpot_try = random.randrange(1, 51, 1)
-    jackpot_win = random.randrange(1, 51, 1)
+    JACKPOT_WILDCARD = 7
+    jackpot_try = random.randrange(1, 100, 1)
 
-    if jackpot_try == jackpot_win:
+    if jackpot_try == JACKPOT_WILDCARD:
       self.current_cash += self.current_jackpot
       self.current_message = SlotMachine.YOU_WIN_JACKPOT + str(self.current_jackpot)
       self.current_jackpot = self.starting_jackpot
