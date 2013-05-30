@@ -67,6 +67,10 @@ class SlotMachine:
   CANNOT_SPIN = "Cannot spin. Change bet to a lower value."
 
   def __init__(self, starting_jackpot, starting_cash):
+    pygame.mixer.init()
+    self.bet_snd = pygame.mixer.Sound("sounds/bet_snd.wav")
+    self.bet_no_cash_snd = pygame.mixer.Sound("sounds/bet_no_cash_snd.wav")
+
     self.JACKPOT_INCREASE_RATE = .15
     self.current_message = SlotMachine.MAIN_MSG
 
@@ -100,8 +104,10 @@ class SlotMachine:
     if self.current_cash - bet >= 0:
       self.bet = bet
       self.current_message = SlotMachine.YOU_BET + str(self.bet)
+      self.bet_snd.play()
     else:
       self.current_message = SlotMachine.NO_CASH_LEFT
+      self.bet_no_cash_snd.play()
 
   def get_bet(self):
     return self.bet
