@@ -26,7 +26,7 @@ class SlotMachineButton(pygame.sprite.Sprite):
   def __init__(self, image_name, value, pos):
     pygame.sprite.Sprite.__init__(self)
     self.image = pygame.image.load(image_name)
-    self.image = self.image.convert()
+    self.image = self.image.convert_alpha()
     self.rect = self.image.get_rect()
     self.value = value
     self.rect = self.rect.move(pos)
@@ -42,7 +42,7 @@ class SlotMachineActionButton(pygame.sprite.Sprite):
   def __init__(self, image_name, method_to_be_called, pos):
     pygame.sprite.Sprite.__init__(self)
     self.image = pygame.image.load(image_name)
-    self.image = self.image.convert()
+    self.image = self.image.convert_alpha()
     self.rect = self.image.get_rect()
     self.rect = self.rect.move(pos)
     self.method_to_be_called = method_to_be_called
@@ -215,7 +215,7 @@ class Icon(pygame.sprite.Sprite):
     pygame.sprite.Sprite.__init__(self)
     self.name = name
     self.image = pygame.image.load("images/" + icon_image)
-    self.image = self.image.convert()
+    self.image = self.image.convert_alpha()
     self.rect = self.image.get_rect()
     self.win_rate_full = win_rate_full
     self.win_rate_two = win_rate_two
