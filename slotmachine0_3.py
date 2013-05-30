@@ -60,7 +60,7 @@ class SlotMachineActionButton(pygame.sprite.Sprite):
 class SlotMachine:
   MAIN_MSG = "Aldrin's Slot Machine"
   YOU_WIN = "You just won $"
-  YOU_WIN_JACKPOT = "You won the jackpot price worth $"
+  YOU_WIN_JACKPOT = "Jackpot won $"
   YOU_LOST = "You just lost $"
   YOU_BET = "You bet $"
   NO_CASH_LEFT = "Cannot bet to that amount. Cash not enough."
@@ -147,7 +147,6 @@ class SlotMachine:
             self.results[spin] = self.icons[7].name
 
       self.__check_results()
-      time.sleep(3)
     else:
       self.current_message = SlotMachine.CANNOT_SPIN
 
@@ -162,9 +161,12 @@ class SlotMachine:
 
   def __check_results(self):
     winnings = 0
+    jackpot_won = 0
     for icon in self.icons:
       if self.results.count(icon.name) == 3:
         winnings += self.bet * icon.win_rate_full
+        # Play jackpot when 3 of a kind is the result
+        jackpot_won = self.jackpot_win()
       if self.results.count(icon.name) == 2:
         winnings += self.bet * icon.win_rate_two
     if self.results.count(self.icons[7].name) == 1:
@@ -172,22 +174,27 @@ class SlotMachine:
     if self.results.count(self.icons[0].name) == 0:
       winnings += self.bet * self.icons[0].bonus_win_rate
 
-    if winnings > 0:
+    if jackpot_won > 0:
+      self.current_message = SlotMachine.YOU_WIN_JACKPOT + str(jackpot_won) + " With Cash $" + str(winnings)
+    elif winnings > 0:
       self.current_cash += winnings
       self.current_message = SlotMachine.YOU_WIN + str(winnings)
-      self.play_jackpot()
-    else:
+    elif winnings <= 0:
       self.current_message = SlotMachine.YOU_LOST + str(self.bet)
+    else:
+      self.current_message = "Somethings wrong"
 
 
-  def play_jackpot(self):
+  def jackpot_win(self):
     JACKPOT_WILDCARD = 7
-    jackpot_try = random.randrange(1, 100, 1)
+    jackpot_try = random.randint(1, 100)
+    winnings = 0
 
     if jackpot_try == JACKPOT_WILDCARD:
       self.current_cash += self.current_jackpot
-      self.current_message = SlotMachine.YOU_WIN_JACKPOT + str(self.current_jackpot)
+      winnings = self.current_jackpot
       self.current_jackpot = self.starting_jackpot
+    return winnings
 
   def get_results(self):
     return self.results
@@ -259,9 +266,10 @@ def start_game():
     {"text": "Bet: ", "method": slot_machine.get_bet, "pos": (50, 400)},
     {"text": "Credit: ", "method": slot_machine.get_current_cash, "pos": (160, 400)},
     {"text": "Jackpot: ", "method": slot_machine.get_current_jackpot, "pos": (330, 400)},
-    {"text": "", "method": slot_machine.get_current_message, "pos": (150, 10)}
   ]
   digital_fonts = pygame.sprite.Group()
+
+  current_message_digifont = DigitalFont("", slot_machine.get_current_message, (150, 10))
 
   for digital_font in digital_fonts_hash:
     digital_fonts.add(DigitalFont(digital_font["text"], digital_font["method"], digital_font["pos"]))
@@ -271,6 +279,7 @@ def start_game():
   distance_between_buttons = 30
   x = 30
   bet_buttons_hash = [
+  #TODO One Button
     {"image_name": "ten_button.png", "value": 10},
     {"image_name": "twenty_button.png", "value": 20},
     {"image_name": "fifty_button.png", "value": 50},
@@ -283,15 +292,9 @@ def start_game():
     bet_buttons.add(slot_machine_btn)
     x += slot_machine_btn.image.get_width() + distance_between_buttons
 
-  action_buttons_hash = [
-    {"image_name": "spin_button.png", "method": slot_machine.spin, "pos": (550, BUTTON_BOTTOM_POS)},
-    #TODO Quit button
-    {"image_name": "reset_button.png", "method": slot_machine.reset, "pos": (670, BUTTON_BOTTOM_POS)}
-  ]
-  action_buttons = pygame.sprite.Group()
-
-  for action_button in action_buttons_hash:
-    action_buttons.add(SlotMachineActionButton("images/" + action_button["image_name"], action_button["method"], action_button["pos"]))
+  spin_button = SlotMachineActionButton("images/spin_button.png" , slot_machine.spin, (550, BUTTON_BOTTOM_POS))
+  reset_button = SlotMachineActionButton("images/reset_button.png" , slot_machine.reset, (670, BUTTON_BOTTOM_POS))
+  action_buttons = pygame.sprite.Group(spin_button, reset_button)
 
   all_symbols = pygame.sprite.Group()
   icons = slot_machine.get_icons()
@@ -306,6 +309,8 @@ def start_game():
     for symbol_name in spin_results:
       if (symbol.name == symbol_name):
         icon_images.append(symbol)
+  start_time = 0
+  spinning = False
 
   continue_playing = True
   while (continue_playing):
@@ -319,9 +324,9 @@ def start_game():
         for bet_button in bet_buttons:
           if(bet_button.rect.collidepoint(event.pos)):
             slot_machine.set_bet(bet_button.get_value())
-        for action_button in action_buttons:
-          if(action_button.rect.collidepoint(event.pos)):
-            action_button.call_method()
+        if(spin_button.rect.collidepoint(event.pos)):
+          if not spinning:
+            spin_button.call_method()
             spin_results = slot_machine.get_results()
 
             icon_images = []
@@ -329,6 +334,11 @@ def start_game():
               for symbol_name in spin_results:
                 if (symbol.name == symbol_name):
                   icon_images.append(symbol)
+            start_time = time.time()
+            spinning = True
+        elif(reset_button.rect.collidepoint(event.pos)):
+          reset_button.call_method()
+
 
     screen.blit(background, background.get_rect())
 
@@ -344,8 +354,14 @@ def start_game():
     for bet_button in bet_buttons:
       screen.blit(bet_button.image, bet_button.pos)
 
-    for i in range(3):
-      screen.blit(icon_images[i].image, reel_positions[i])
+    if time.time() - start_time < 1:
+      for i in range(3):
+        screen.blit(icons[random.randint(0, len(icons) - 1)].image, reel_positions[i])
+    else:
+      for i in range(3):
+        screen.blit(icon_images[i].image, reel_positions[i])
+      screen.blit(current_message_digifont.get_rendered_surface(), current_message_digifont.get_pos())
+      spinning = False
 
     pygame.display.flip()
 
