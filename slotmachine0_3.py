@@ -317,6 +317,27 @@ def start_game():
   spinning = False
   prev_results = slot_machine.get_results()
 
+  #Play the bg music
+  pygame.mixer.music.load("sounds/background_msc.wav")
+  pygame.mixer.music.play(-1)
+
+  prev_bet, prev_jackpot, prev_current_msg, prev_cash = slot_machine.bet, slot_machine.current_jackpot, slot_machine.current_message, slot_machine.current_cash
+  def prev_get_bet():
+    return prev_bet
+  def prev_get_current_cash():
+    return prev_cash
+  def prev_get_current_jackpot():
+    return prev_jackpot
+  def prev_get_current_msg():
+    return prev_current_msg
+
+  prev_bet_digifont = DigitalFont("Bet: ", prev_get_bet, (50, 400))
+  prev_cash_digifont = DigitalFont("Credit: ", prev_get_current_cash, (160, 400))
+  prev_jackpot_digifont = DigitalFont("Jackpot: ", prev_get_current_jackpot, (330, 400))
+  prev_message_digifont = DigitalFont("", prev_get_current_msg, (150, 10))
+
+  prev_digifonts = pygame.sprite.Group(prev_bet_digifont, prev_jackpot_digifont, prev_cash_digifont, prev_message_digifont)
+
   continue_playing = True
   while (continue_playing):
     # Tick
@@ -339,6 +360,7 @@ def start_game():
               for symbol_name in spin_results:
                 if (symbol.name == symbol_name):
                   icon_images.append(symbol)
+
             start_time = time.time()
             spinning = True
         elif(reset_button.rect.collidepoint(event.pos)):
@@ -353,20 +375,22 @@ def start_game():
       screen.blit(action_button.image, action_button.get_pos())
 
     digital_fonts.update()
-    for digital_font in digital_fonts:
-      screen.blit(digital_font.get_rendered_surface(), digital_font.get_pos())
 
     bet_buttons.update()
     for bet_button in bet_buttons:
       screen.blit(bet_button.image, bet_button.pos)
 
-    if time.time() - start_time < 1:
+    if time.time() - start_time < 1 and spinning:
       for i in range(3):
         screen.blit(prev_results[i].image, reel_positions[i])
-    elif time.time() - start_time < 2:
+      for digital_font in prev_digifonts:
+        screen.blit(digital_font.get_rendered_surface(), digital_font.get_pos())
+    elif time.time() - start_time < 2 and spinning:
       for i in range(3):
         screen.blit(icons[random.randint(0, len(icons) - 1)].image, reel_positions[i])
       slot_machine.spinning_snd.play()
+      for digital_font in prev_digifonts:
+        screen.blit(digital_font.get_rendered_surface(), digital_font.get_pos())
     else:
       for i in range(3):
         screen.blit(icon_images[i].image, reel_positions[i])
@@ -374,6 +398,10 @@ def start_game():
       spinning = False
       prev_results = icon_images
       slot_machine.spinning_snd.stop()
+      for digital_font in digital_fonts:
+        screen.blit(digital_font.get_rendered_surface(), digital_font.get_pos())
+
+      prev_bet, prev_jackpot, prev_current_msg, prev_cash = slot_machine.bet, slot_machine.current_jackpot, slot_machine.current_message, slot_machine.current_cash
 
     pygame.display.flip()
 
