@@ -285,8 +285,8 @@ def start_game():
   bet_buttons_hash = [
   #TODO One Button
     {"image_name": "ten_button.png", "value": 10, "pos": (70, BUTTON_BOTTOM_POS)},
-    {"image_name": "twenty_button.png", "value": 20, "pos": (150, BUTTON_BOTTOM_POS)},
-    {"image_name": "fifty_button.png", "value": 50, "pos": (480, BUTTON_BOTTOM_POS)},
+    {"image_name": "twenty_button.png", "value": 20, "pos": (140, BUTTON_BOTTOM_POS)},
+    {"image_name": "fifty_button.png", "value": 50, "pos": (490, BUTTON_BOTTOM_POS)},
     {"image_name": "hundred_button.png", "value": 100, "pos": (560, BUTTON_BOTTOM_POS)}
   ]
   bet_buttons = pygame.sprite.Group()
@@ -296,7 +296,8 @@ def start_game():
 
   spin_button = SlotMachineActionButton("images/spin_button.png" , slot_machine.spin, (270, BUTTON_BOTTOM_POS))
   reset_button = SlotMachineActionButton("images/reset_button.png" , slot_machine.reset, (210, BUTTON_BOTTOM_POS + 30))
-  action_buttons = pygame.sprite.Group(spin_button, reset_button)
+  quit_button = SlotMachineActionButton("images/quit_button.png" , slot_machine.reset, (422, BUTTON_BOTTOM_POS + 30))
+  action_buttons = pygame.sprite.Group(spin_button, reset_button, quit_button)
 
   all_symbols = pygame.sprite.Group()
   icons = slot_machine.get_icons()
@@ -351,19 +352,24 @@ def start_game():
         if(spin_button.rect.collidepoint(event.pos)):
           if not spinning:
             spin_button.call_method()
-            spin_results = slot_machine.get_results()
+            if slot_machine.current_message != SlotMachine.CANNOT_SPIN:
+              spin_results = slot_machine.get_results()
 
-            icon_images = []
-            for symbol in all_symbols:
-              for symbol_name in spin_results:
-                if (symbol.name == symbol_name):
-                  icon_images.append(symbol)
+              icon_images = []
+              for symbol in all_symbols:
+                for symbol_name in spin_results:
+                  if (symbol.name == symbol_name):
+                    icon_images.append(symbol)
 
-            start_time = time.time()
-            spinning = True
+              start_time = time.time()
+              spinning = True
+            else:
+              slot_machine.bet_no_cash_snd.play()
         elif(reset_button.rect.collidepoint(event.pos)):
           slot_machine.reset_snd.play()
           reset_button.call_method()
+        elif(quit_button.rect.collidepoint(event.pos)):
+          continue_playing = False
 
 
     screen.blit(background, background.get_rect())
