@@ -332,7 +332,7 @@ def start_game():
   prev_bet_digifont = DigitalFont(prev_get_bet, (245, 424))
   prev_cash_digifont = DigitalFont(prev_get_current_cash, (80, 424))
   prev_jackpot_digifont = DigitalFont(prev_get_current_jackpot, (445, 424))
-  prev_message_digifont = DigitalFont(prev_get_current_msg, (100, 140))
+  prev_message_digifont = DigitalFont(prev_get_current_msg, (100, 140), (0, 0, 0))
 
   prev_digifonts = pygame.sprite.Group(prev_bet_digifont, prev_jackpot_digifont, prev_cash_digifont, prev_message_digifont)
 
