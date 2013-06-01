@@ -292,8 +292,18 @@ class SlotMachine:
 
 """
   Class: Icon
+  Description: The icons shown inside the reels
 """
 class Icon(pygame.sprite.Sprite):
+  """
+    Constructor:
+      params:
+        name: The name of the icon
+        win_rate_full: The winning rate when 3 of these icons are selected
+        win_rate_two: The winning rate when 2 of these icons are selected
+        icon_image: The file name of the image of this sprite
+        bonus_win_rate: Optional win rate for special icons
+  """
   def __init__(self, name, win_rate_full, win_rate_two, icon_image, bonus_win_rate = 0):
     pygame.sprite.Sprite.__init__(self)
     self.name = name
@@ -304,25 +314,18 @@ class Icon(pygame.sprite.Sprite):
     self.win_rate_two = win_rate_two
     self.bonus_win_rate = bonus_win_rate
 
-  def get_win_rate_full():
-    return self.win_rate_full
-
-  def get_win_rate_two():
-    return self.win_rate_two
-
-  def get_bonus_win_rate():
-    return self.bonus_win_rate
-
-  def get_name():
-    return self.name
-
-  def get_image():
-    return self.image
-
 """
   Class: DigitalFont
+  Description: An object that shows a text label using the digital font ttf.
 """
 class DigitalFont(pygame.sprite.Sprite):
+  """
+    Constructor:
+      params:
+        method: The method that is used to grab the right message
+        pos: The text's position in the screen
+        color: Optional parameter which is the color of the text
+  """
   def __init__(self, method, pos, color = (196,65,46)):
     pygame.sprite.Sprite.__init__(self)
     self.digital_font = pygame.font.Font("fonts/DS-DIGIT.TTF", 22)
@@ -330,12 +333,18 @@ class DigitalFont(pygame.sprite.Sprite):
     self.meth = method
     self.pos = pos
 
+  """
+    Method: Get rendered surface
+    Purpose: Returns the rendered text
+    Returns: The rendered text
+  """
   def get_rendered_surface(self):
     return self.digital_font.render(str(self.meth()), 1, self.font_color)
 
-  def get_pos(self):
-    return self.pos
-
+  """
+    Method: Update
+    Purpose: Render the text
+  """
   def update(self):
     self.digital_font.render(str(self.meth()), 1, self.font_color)
 
