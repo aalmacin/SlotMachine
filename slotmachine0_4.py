@@ -360,7 +360,7 @@ def start_game():
   pygame.display.set_caption(GAME_TITLE)
 
   # Create the slot machine object and hashes to be used by the game
-  slot_machine = SlotMachine(500, 1000)
+  slot_machine = SlotMachine(10000, 1000)
   spin_results = slot_machine.results
   icon_images = [] # The current icon images or spin result icons
 
