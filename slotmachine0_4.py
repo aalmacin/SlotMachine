@@ -238,8 +238,9 @@ class SlotMachine:
       # Check how many of this icon is on the reel. Multiply the win rate to the bet and add it to winnings.
       if self.results.count(icon.name) == 3:
         winnings += self.bet * icon.win_rate_full
-        # Play jackpot when 3 of a kind is the result
-        jackpot_won = self.jackpot_win()
+        # Play jackpot when 3 of a kind and not sadface is the result
+        if winnings > 0:
+          jackpot_won = self.jackpot_win()
       if self.results.count(icon.name) == 2:
         winnings += self.bet * icon.win_rate_two
     # If there is 1 Siete, it is considered a win
