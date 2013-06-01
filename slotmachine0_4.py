@@ -89,6 +89,8 @@ class SlotMachine:
   YOU_BET = "You bet $"
   NO_CASH_LEFT = "Cannot bet to that amount. Cash not enough."
   CANNOT_SPIN = "Cannot spin. Change bet to a lower value."
+  STARTING_BET = 10
+  JACKPOT_INCREASE_RATE = .15
 
   """
     Constructor:
@@ -97,8 +99,6 @@ class SlotMachine:
         starting_cash: The Starting cash when the game starts
   """
   def __init__(self, starting_jackpot, starting_cash):
-    self.JACKPOT_INCREASE_RATE = .15
-    self.STARTING_BET = 10
     # Set all the sounds
     pygame.mixer.init()
     self.bet_snd = pygame.mixer.Sound("sounds/bet_snd.wav")
@@ -157,6 +157,10 @@ class SlotMachine:
       self.current_message = SlotMachine.NO_CASH_LEFT
       self.bet_no_cash_snd.play()
 
+  """
+    Group of Functions: Getters
+    Purpose: These methods are used to get attributes as a method.
+  """
   def get_bet(self):
     return self.bet
 
@@ -166,63 +170,87 @@ class SlotMachine:
   def get_current_jackpot(self):
     return self.current_jackpot
 
-  def get_icons(self):
-    return self.icons
-
-  def spin(self):
-    if self.current_cash - self.bet >= 0:
-      self.spin_snd.play()
-      self.__pay()
-      self.__increase_jackpot()
-
-      for spin in range(3):
-        spinned_result = random.randint(0, 100)
-
-        if spinned_result in range(0, 40):
-            self.results[spin] = self.icons[0].name
-        elif spinned_result in range(40, 56):
-            self.results[spin] = self.icons[1].name
-        elif spinned_result in range(56, 70):
-            self.results[spin] = self.icons[2].name
-        elif spinned_result in range(70, 82):
-            self.results[spin] = self.icons[3].name
-        elif spinned_result in range(82, 89):
-            self.results[spin] = self.icons[4].name
-        elif spinned_result in range(89, 95):
-            self.results[spin] = self.icons[5].name
-        elif spinned_result in range(95, 99):
-            self.results[spin] = self.icons[6].name
-        elif spinned_result in range(99, 100):
-            self.results[spin] = self.icons[7].name
-
-      self.__check_results()
-    else:
-      self.current_message = SlotMachine.CANNOT_SPIN
-
   def get_current_message(self):
     return self.current_message
 
+  """
+    Method: Spin
+    Purpose: Method used to spin the reels in the slot machine. It generates spin values to be used as spin data. Spinning is only allowed when there is enough money to do so.
+  """
+  def spin(self):
+    if self.current_cash - self.bet >= 0:
+      self.spin_snd.play()
+      # pay the bet and increase the jackpot
+      self.__pay()
+      self.__increase_jackpot()
+
+      # For each reel
+      for spin in range(3):
+        # Save the wildcard number as spinned_result
+        spinned_result = random.randint(0, 100)
+
+        if spinned_result in range(0, 40):     # 40% Chance
+            self.results[spin] = self.icons[0].name
+        elif spinned_result in range(40, 56):  # 16% Chance
+            self.results[spin] = self.icons[1].name
+        elif spinned_result in range(56, 70):  # 14% Chance
+            self.results[spin] = self.icons[2].name
+        elif spinned_result in range(70, 82):  # 12% Chance
+            self.results[spin] = self.icons[3].name
+        elif spinned_result in range(82, 89):  # 7% Chance
+            self.results[spin] = self.icons[4].name
+        elif spinned_result in range(89, 95):  # 6% Chance
+            self.results[spin] = self.icons[5].name
+        elif spinned_result in range(95, 99):  # 4% Chance
+            self.results[spin] = self.icons[6].name
+        elif spinned_result in range(99, 100):  # 1% Chance
+            self.results[spin] = self.icons[7].name
+
+      # Check what does the result of the calculation rewards.
+      self.__check_results()
+    else:
+      # Show the message why the slot machine cannot be spinned
+      self.current_message = SlotMachine.CANNOT_SPIN
+
+  """
+    Method: Pay
+    Purpose: Private method used to reduce the cash using the bet amount. Pays for one spin.
+  """
   def __pay(self):
     self.current_cash -= self.bet
 
+  """
+    Method: Increase jackpot
+    Purpose: Private method used to increase the jackpot prize to be winned.
+  """
   def __increase_jackpot(self):
-    self.current_jackpot += (int(self.bet * self.JACKPOT_INCREASE_RATE))
+    self.current_jackpot += (int(self.bet * SlotMachine.JACKPOT_INCREASE_RATE))
 
+  """
+    Method: Check results
+    Purpose: Check how much the player won or lost
+  """
   def __check_results(self):
     winnings = 0
     jackpot_won = 0
+    # Go through each icon and check how many of the said icon is present. Base on that, check how much the player have won.
     for icon in self.icons:
+      # Check how many of this icon is on the reel. Multiply the win rate to the bet and add it to winnings.
       if self.results.count(icon.name) == 3:
         winnings += self.bet * icon.win_rate_full
         # Play jackpot when 3 of a kind is the result
         jackpot_won = self.jackpot_win()
       if self.results.count(icon.name) == 2:
         winnings += self.bet * icon.win_rate_two
+    # If there is 1 Siete, it is considered a win
     if self.results.count(self.icons[7].name) == 1:
       winnings += self.bet * self.icons[7].bonus_win_rate
+    # If there is no sad face, it is considered a bet return win
     if self.results.count(self.icons[0].name) == 0:
       winnings += self.bet * self.icons[0].bonus_win_rate
 
+    # If the winner won the jackpot or the winner just won something or the winner lost
+    # Set the appropriate message
     if jackpot_won > 0:
       self.current_message = SlotMachine.YOU_WIN_JACKPOT + str(jackpot_won) + " With Cash $" + str(winnings)
     elif winnings > 0:
@@ -233,21 +261,32 @@ class SlotMachine:
     else:
       self.current_message = "Somethings wrong"
 
-
+  """
+    Method: Jackpot win
+    Purpose: Play the jackpot and return the value of the player's jackpot price.
+    Returns: The jackpot winnings
+  """
   def jackpot_win(self):
+    # Set the wildcard jackpot number
     JACKPOT_WILDCARD = 7
+    # Generate a random number from 1 to 100
     jackpot_try = random.randint(1, 100)
     winnings = 0
 
+    # Compare the wildcard to the random number
     if jackpot_try == JACKPOT_WILDCARD:
+      # If they match, then the user wins
       self.current_cash += self.current_jackpot
+      # Set the current jackpot as the winnings. This is done before resetting the jackpot price to the starting jackpot value.
       winnings = self.current_jackpot
+      # Reset the jackpot
       self.current_jackpot = self.starting_jackpot
     return winnings
 
-  def get_results(self):
-    return self.results
-
+  """
+    Method: Reset
+    Purpose: Resets the slot machine to its default values when the slot machine started.
+  """
   def reset(self):
     self.set_resettable_values()
 
@@ -307,7 +346,7 @@ def start_game():
   pygame.display.set_caption(GAME_TITLE)
 
   slot_machine = SlotMachine(500, 1000)
-  spin_results = slot_machine.get_results()
+  spin_results = slot_machine.results
   icon_images = []
 
   digital_fonts_hash = [
@@ -343,7 +382,7 @@ def start_game():
   action_buttons = pygame.sprite.Group(spin_button, reset_button, quit_button)
 
   all_symbols = pygame.sprite.Group()
-  icons = slot_machine.get_icons()
+  icons = slot_machine.icons
   for icon in icons:
     all_symbols.add(icon)
 
@@ -357,7 +396,7 @@ def start_game():
         icon_images.append(symbol)
   start_time = 0
   spinning = False
-  prev_results = slot_machine.get_results()
+  prev_results = slot_machine.results
 
   #Play the bg music
   pygame.mixer.music.load("sounds/background_msc.wav")
@@ -396,7 +435,7 @@ def start_game():
           if not spinning:
             spin_button.execute_func()
             if slot_machine.current_message != SlotMachine.CANNOT_SPIN:
-              spin_results = slot_machine.get_results()
+              spin_results = slot_machine.results
 
               icon_images = []
               for symbol in all_symbols:
