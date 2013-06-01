@@ -106,9 +106,11 @@ VII.	Sound Index
     <td>Bet sound</td>
     <td>sounds/bet_snd.wav</td>
   </tr>
+  <tr>
     <td>Reset sound</td>
     <td>sounds/reset_snd.ogg</td>
   </tr>
+  <tr>
     <td>Spin/pull lever sound</td>
     <td>sounds/spin_snd.ogg</td>
   </tr>
